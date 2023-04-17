@@ -29,6 +29,7 @@ struct ContentView: View {
                     }
                 }
                     .frame(maxHeight: .infinity)
+                    .backgroundStyle(.opacity(0))
                 
                 Viewport3DView()
                     .ignoresSafeArea()
