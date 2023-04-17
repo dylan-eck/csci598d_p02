@@ -12,16 +12,17 @@ struct MeshPreviewApp: App {
         }
             .windowStyle(HiddenTitleBarWindowStyle())
             .commands {
-            CommandGroup(replacing: CommandGroupPlacement.newItem) {
-                Button("Open File...") {
-                    let panel = NSOpenPanel()
-                    panel.allowsMultipleSelection = false
-                    panel.canChooseDirectories = false
-                    if panel.runModal() == .OK {
-                        sceneData.modelURL = panel.url
-                    }
-                }.keyboardShortcut("o", modifiers: .command)
+                CommandGroup(replacing: CommandGroupPlacement.newItem) {
+                    Button("Open File...") {
+                        let panel = NSOpenPanel()
+                        panel.allowsMultipleSelection = false
+                        panel.canChooseDirectories = false
+                        if panel.runModal() == .OK {
+                            sceneData.modelURL = panel.url
+                        }
+                    }.keyboardShortcut("o", modifiers: .command)
+                }
+                SidebarCommands()
             }
-        }
     }
 }

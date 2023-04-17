@@ -4,38 +4,45 @@ import MetalKit
 struct ContentView: View {
     @EnvironmentObject var sceneData: SceneData
 
-    let items = ["item1", "item2", "item3"]
-
     var body: some View {
-        
-        HStack {
-            NavigationView {
-                List {
-                    DisclosureGroup("Model Info") {
-                        VStack(alignment: .leading) {
-                            Text("vertex count")
-                            Text("triangle count")
-                        }
+        NavigationView {
+            List {
+                DisclosureGroup("Model Info") {
+                    VStack(alignment: .leading) {
+                        Text("vertex count")
+                        Text("triangle count")
                     }
+                }
+                
+                DisclosureGroup("Viewport Settings") {
                     
-                    DisclosureGroup("Viewport Settings") {
-                        
+                }
+                
+                DisclosureGroup("Camera Settings") {
+                    Button(action: {sceneData.toggleProjection()}) {
+                        Text("toggle projection")
                     }
-                    
-                    DisclosureGroup("Camera Settings") {
-                        Button(action: {sceneData.toggleProjection()}) {
-                            Text("toggle projection")
+                }
+            }
+                .frame(maxHeight: .infinity)
+                .backgroundStyle(.opacity(0))
+                .toolbar {
+                    ToolbarItem {
+                        Button(action: toggleSidebar) {
+                            Label("toggle sidebar visibility", systemImage: "sidebar.left")
                         }
                     }
                 }
-                    .frame(maxHeight: .infinity)
-                    .backgroundStyle(.opacity(0))
-                
-                Viewport3DView()
-                    .ignoresSafeArea()
-            }
-                .frame(idealWidth: 400)
+            
+            Viewport3DView()
+                .ignoresSafeArea()
         }
+            .frame(idealWidth: 400)
+           
+    }
+    
+    private func toggleSidebar() { // 2
+        NSApp.keyWindow?.firstResponder?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
     }
 }
 
