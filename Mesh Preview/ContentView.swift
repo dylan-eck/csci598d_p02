@@ -7,7 +7,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
-                DisclosureGroup("Model Info") {
+                DisclosureGroup("Mesh Info") {
                     VStack(alignment: .leading) {
                         Text("vertex count")
                         Text("triangle count")
@@ -30,12 +30,27 @@ struct ContentView: View {
                     ToolbarItem {
                         Button(action: toggleSidebar) {
                             Label("toggle sidebar visibility", systemImage: "sidebar.left")
+                                .imageScale(.large)
                         }
                     }
                 }
             
             Viewport3DView()
                 .ignoresSafeArea()
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            let mouseLocation = Vec2(Float32(value.location.x), Float32(value.location.y))
+                            if let lastLocation = sceneData.lastMouseLocation {
+                                sceneData.mouseDelta = mouseLocation - lastLocation
+                            }
+                            sceneData.lastMouseLocation = mouseLocation
+                        }
+                        .onEnded { value in
+                            sceneData.mouseDelta = Vec2(0, 0)
+                            sceneData.lastMouseLocation = nil
+                        }
+                )
         }
             .frame(idealWidth: 400)
            

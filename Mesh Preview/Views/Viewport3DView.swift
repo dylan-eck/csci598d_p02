@@ -29,6 +29,10 @@ struct Viewport3DView: NSViewRepresentable {
     func updateNSView(_ nsView: MTKView, context: NSViewRepresentableContext<Viewport3DView>) {
         
     }
+    
+    func handleDragGesture(_ value: DragGesture.Value) {
+        print(value.location)
+    }
 }
 
 struct Viewport3DView_Previews: PreviewProvider {

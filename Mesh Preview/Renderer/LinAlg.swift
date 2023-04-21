@@ -8,10 +8,23 @@
 import Foundation
 
 typealias Vec2 = simd_float2
-typealias Vec3 = simd_float3
-typealias Vec4 = simd_float4
-typealias Mat4 = simd_float4x4
+extension Vec2 {
+    var formattedString: String {
+        String(format: "(% .4f, % .4f)", self.x, self.y)
+    }
+}
 
+typealias Vec3 = simd_float3
+extension Vec3 {
+    init(_ value: Float32) {
+        self.init(repeating: value)
+    }
+}
+
+
+typealias Vec4 = simd_float4
+
+typealias Mat4 = simd_float4x4
 extension Mat4 {
     static func rotateX(_ matrix: Mat4, _ angle: Float32) -> Mat4 {
         let rotation = Mat4(rows: [
@@ -155,11 +168,5 @@ extension Mat4 {
         }
         matString += "]"
         return matString;
-    }
-}
-
-extension Vec3 {
-    init(_ value: Float32) {
-        self.init(repeating: value)
     }
 }
