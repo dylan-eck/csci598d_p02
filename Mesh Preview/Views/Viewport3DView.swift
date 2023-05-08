@@ -22,16 +22,24 @@ struct Viewport3DView: NSViewRepresentable {
         if let device = MTLCreateSystemDefaultDevice() {
             mtkView.device = device
         }
+        
+        let panGestureRecognizer = NSPanGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(context.coordinator.handlePanGesture(_:))
+        )
+        mtkView.addGestureRecognizer(panGestureRecognizer)
+
+        let magnificationGestureRecognizer = NSMagnificationGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(context.coordinator.handleMagnificationGesture(_:))
+        )
+        mtkView.addGestureRecognizer(magnificationGestureRecognizer)
 
         return mtkView
     }
     
     func updateNSView(_ nsView: MTKView, context: NSViewRepresentableContext<Viewport3DView>) {
         
-    }
-    
-    func handleDragGesture(_ value: DragGesture.Value) {
-        print(value.location)
     }
 }
 

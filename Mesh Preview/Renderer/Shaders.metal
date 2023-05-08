@@ -7,6 +7,7 @@ struct VertexIn {
     float4 position [[attribute(0)]];
     float3 color [[attribute(1)]];
     float3 normal [[attribute(2)]];
+    float2 uv [[attribute(3)]];
 };
 
 struct VertexOut {
@@ -16,12 +17,28 @@ struct VertexOut {
 
 vertex VertexOut vertexShader(
     const VertexIn vertex_in [[stage_in]],
-    const device VertexShaderUniforms& uniforms[[buffer(1)]]
+    const device ShaderUniforms& uniforms[[buffer(1)]]
 ) {
 
     VertexOut output;
     output.position = uniforms.projectionMatrix * uniforms.viewMatrix * uniforms.modelMatrix * vertex_in.position;
-    output.color = float4(vertex_in.color, 1.0);
+
+    switch (uniforms.attributeSelector) {
+    case VertexAttributePosition:
+        output.color = float4(vertex_in.position);
+        break;
+    case VertexAttributeColor:
+        output.color = float4(vertex_in.color, 1.0);
+        break;
+    case VertexAttributeNormal:
+        output.color = float4(vertex_in.normal, 1.0);
+        break;
+    case VertexAttributeTexCoord:
+        output.color = float4(vertex_in.uv, 0.0, 1.0);
+        break;
+    default:
+        output.color = float4(1.0);
+    }
     
     return output;
 }
@@ -49,7 +66,7 @@ float3 unprojectPoint(float x, float y, float z, float4x4 inverseView, float4x4 
 vertex GridPassThrough gridVertexShader(
     const device Vertex *vertices[[buffer(0)]],
     unsigned int id[[vertex_id]],
-    const device VertexShaderUniforms& uniforms[[buffer(1)]]
+    const device ShaderUniforms& uniforms[[buffer(1)]]
 ) {
     int3 gridPlane[] = {
         int3(-1, -1, 0),
@@ -111,7 +128,7 @@ struct GridFragmentOut {
 
 fragment GridFragmentOut gridFragmentShader(
     GridPassThrough input [[stage_in]],
-    const device VertexShaderUniforms& uniforms[[buffer(1)]]
+    const device ShaderUniforms& uniforms[[buffer(1)]]
 ) {
     float t = -input.nearPoint.y / (input.farPoint.y - input.nearPoint.y);
     float3 position = input.nearPoint + t * (input.farPoint - input.nearPoint);

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2426B4F02A06E965005E6F82 /* suzanne_color.obj in Resources */ = {isa = PBXBuildFile; fileRef = 2426B4EF2A06E965005E6F82 /* suzanne_color.obj */; };
+		2426B4F22A06EE63005E6F82 /* plane_color.obj in Resources */ = {isa = PBXBuildFile; fileRef = 2426B4F12A06EE63005E6F82 /* plane_color.obj */; };
+		2426B4F42A06EE68005E6F82 /* plane.obj in Resources */ = {isa = PBXBuildFile; fileRef = 2426B4F32A06EE68005E6F82 /* plane.obj */; };
 		248A97B029E4AD1400275F9A /* Viewport3DView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248A97AF29E4AD1400275F9A /* Viewport3DView.swift */; };
 		248C098729EDD77D005B54CE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24BB1BBA29E11CB7004C1C06 /* Assets.xcassets */; };
 		24B6B75029E6FD9400EDEDF5 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B6B74F29E6FD9400EDEDF5 /* Camera.swift */; };
@@ -19,12 +22,16 @@
 		24BB1BC629E11CB7004C1C06 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BB1BC029E11CB7004C1C06 /* ContentView.swift */; };
 		24BB1BC729E11CB7004C1C06 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BB1BC129E11CB7004C1C06 /* Renderer.swift */; };
 		24F0D91A29E5CC0000197634 /* Cube.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F0D91929E5CC0000197634 /* Cube.swift */; };
-		24F606A029ED0F5A00ED306D /* InputController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F6069F29ED0F5A00ED306D /* InputController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		24132F4429D7670900266D5F /* Mesh Preview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mesh Preview.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2426B4EF2A06E965005E6F82 /* suzanne_color.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = suzanne_color.obj; sourceTree = "<group>"; };
+		2426B4F12A06EE63005E6F82 /* plane_color.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = plane_color.obj; sourceTree = "<group>"; };
+		2426B4F32A06EE68005E6F82 /* plane.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = plane.obj; sourceTree = "<group>"; };
+		2426B51D2A08660B005E6F82 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		248A97AF29E4AD1400275F9A /* Viewport3DView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Viewport3DView.swift; sourceTree = "<group>"; };
+		249C1DB22A087F010024560A /* shared.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shared.h; sourceTree = "<group>"; };
 		24B6B74F29E6FD9400EDEDF5 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		24B6B75529E76F7F00EDEDF5 /* suzanne.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = suzanne.obj; sourceTree = "<group>"; };
 		24B6B75929E8AA1100EDEDF5 /* LinAlg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinAlg.swift; sourceTree = "<group>"; };
@@ -38,7 +45,6 @@
 		24BB1BC029E11CB7004C1C06 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		24BB1BC129E11CB7004C1C06 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		24F0D91929E5CC0000197634 /* Cube.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cube.swift; sourceTree = "<group>"; };
-		24F6069F29ED0F5A00ED306D /* InputController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +63,7 @@
 			children = (
 				24BB1BB829E11CB7004C1C06 /* Mesh Preview */,
 				24132F4529D7670900266D5F /* Products */,
+				2426B51C2A08660B005E6F82 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -66,6 +73,14 @@
 				24132F4429D7670900266D5F /* Mesh Preview.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2426B51C2A08660B005E6F82 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2426B51D2A08660B005E6F82 /* Foundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		248A97AE29E4AD0300275F9A /* Views */ = {
@@ -80,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				24BB1BBE29E11CB7004C1C06 /* definitions.h */,
+				249C1DB22A087F010024560A /* shared.h */,
 				24BB1BBB29E11CB7004C1C06 /* Shaders.metal */,
 				24BB1BC129E11CB7004C1C06 /* Renderer.swift */,
 				24B6B74F29E6FD9400EDEDF5 /* Camera.swift */,
@@ -91,6 +107,9 @@
 		24B6B75229E7461E00EDEDF5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2426B4F32A06EE68005E6F82 /* plane.obj */,
+				2426B4F12A06EE63005E6F82 /* plane_color.obj */,
+				2426B4EF2A06E965005E6F82 /* suzanne_color.obj */,
 				24B6B75529E76F7F00EDEDF5 /* suzanne.obj */,
 				24F0D91929E5CC0000197634 /* Cube.swift */,
 			);
@@ -110,7 +129,6 @@
 			children = (
 				24BB1BB929E11CB7004C1C06 /* MeshPreviewApp.swift */,
 				24BB1BC029E11CB7004C1C06 /* ContentView.swift */,
-				24F6069F29ED0F5A00ED306D /* InputController.swift */,
 				248A97AE29E4AD0300275F9A /* Views */,
 				24B6B75B29EA877300EDEDF5 /* DataModels */,
 				248A97B129E4AF8E00275F9A /* Renderer */,
@@ -192,7 +210,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2426B4F02A06E965005E6F82 /* suzanne_color.obj in Resources */,
 				24BB1BC529E11CB7004C1C06 /* Preview Assets.xcassets in Resources */,
+				2426B4F42A06EE68005E6F82 /* plane.obj in Resources */,
+				2426B4F22A06EE63005E6F82 /* plane_color.obj in Resources */,
 				248C098729EDD77D005B54CE /* Assets.xcassets in Resources */,
 				24B6B75629E76F7F00EDEDF5 /* suzanne.obj in Resources */,
 			);
@@ -213,7 +234,6 @@
 				24BB1BC629E11CB7004C1C06 /* ContentView.swift in Sources */,
 				24B6B75D29EA878B00EDEDF5 /* SceneData.swift in Sources */,
 				24F0D91A29E5CC0000197634 /* Cube.swift in Sources */,
-				24F606A029ED0F5A00ED306D /* InputController.swift in Sources */,
 				24BB1BC229E11CB7004C1C06 /* MeshPreviewApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -359,7 +379,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "\"com.dylaneck.Mesh Preview\"";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Mesh Preview/Renderer/definitions.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/dylaneck/local/school/college/masters/2023/spring/CSCI598D/csci598d_p02/Mesh Preview/Renderer/definitions.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -389,7 +409,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "\"com.dylaneck.Mesh Preview\"";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Mesh Preview/Renderer/definitions.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/dylaneck/local/school/college/masters/2023/spring/CSCI598D/csci598d_p02/Mesh Preview/Renderer/definitions.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

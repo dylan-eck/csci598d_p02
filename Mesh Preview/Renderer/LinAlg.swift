@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import simd
 
 typealias Vec2 = simd_float2
 extension Vec2 {

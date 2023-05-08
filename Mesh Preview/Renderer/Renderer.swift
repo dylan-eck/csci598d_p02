@@ -1,60 +1,75 @@
 import MetalKit
 import ModelIO
-import SwiftUI
+import simd
+
+extension MTLVertexDescriptor {
+    static var defaultDescriptor: MTLVertexDescriptor {
+        let vertexDescriptor = MTLVertexDescriptor()
+        
+        vertexDescriptor.attributes[0].format = .float3
+        vertexDescriptor.attributes[0].offset = 0
+        vertexDescriptor.attributes[0].bufferIndex = 0
+        
+        vertexDescriptor.attributes[1].format = .float3
+        vertexDescriptor.attributes[1].offset = MemoryLayout<simd_float3>.stride
+        vertexDescriptor.attributes[1].bufferIndex = 0
+        
+        vertexDescriptor.attributes[2].format = .float3
+        vertexDescriptor.attributes[2].offset = 2 * MemoryLayout<simd_float3>.stride
+        vertexDescriptor.attributes[2].bufferIndex = 0
+        
+        vertexDescriptor.attributes[3].format = .float2
+        vertexDescriptor.attributes[3].offset = 3 * MemoryLayout<simd_float3>.stride
+        vertexDescriptor.attributes[3].bufferIndex = 0
+        
+        vertexDescriptor.layouts[0].stride = 3 * MemoryLayout<simd_float3>.stride + MemoryLayout<simd_float2>.stride
+        
+        return vertexDescriptor
+    }
+}
+
+extension MDLVertexDescriptor {
+    static var defaultDescriptor: MDLVertexDescriptor {
+        let vertexDescriptor = MTKModelIOVertexDescriptorFromMetal(MTLVertexDescriptor.defaultDescriptor)
+        
+        let position = vertexDescriptor.attributes[0] as! MDLVertexAttribute
+        position.name = MDLVertexAttributePosition
+        
+        let color = vertexDescriptor.attributes[1] as! MDLVertexAttribute
+        color.name = MDLVertexAttributeColor
+        
+        let normal = vertexDescriptor.attributes[2] as! MDLVertexAttribute
+        normal.name = MDLVertexAttributeNormal
+        
+        let uv = vertexDescriptor.attributes[3] as! MDLVertexAttribute
+        uv.name = MDLVertexAttributeTextureCoordinate
+        
+        return vertexDescriptor
+    }
+}
+
+
 
 func loadModel(from url: URL, to device: MTLDevice) -> MTKMesh? {
-    let vertexDescriptor = MDLVertexDescriptor()
-    
-    vertexDescriptor.attributes[0] = MDLVertexAttribute(
-        name: MDLVertexAttributePosition,
-        format: .float3,
-        offset: 0,
-        bufferIndex: 0
-    )
-    
-    vertexDescriptor.attributes[1] = MDLVertexAttribute(
-        name: MDLVertexAttributeColor,
-        format: .float3,
-        offset: MemoryLayout<Float>.stride * 3,
-        bufferIndex: 0
-    )
-    
-    vertexDescriptor.attributes[2] = MDLVertexAttribute(
-        name: MDLVertexAttributeNormal,
-        format: .float3,
-        offset: MemoryLayout<Float>.stride * 6,
-        bufferIndex: 0
-    )
     
     let bufferAllocator = MTKMeshBufferAllocator(device: device)
-    let asset = MDLAsset(url: url, vertexDescriptor: vertexDescriptor, bufferAllocator: bufferAllocator)
+    let asset = MDLAsset(
+        url: url,
+        vertexDescriptor: MDLVertexDescriptor.defaultDescriptor,
+        bufferAllocator: bufferAllocator
+    )
     
-    guard let mdlMesh = asset.childObjects(of: MDLMesh.self).first as? MDLMesh else {
+    guard let mdlMesh = (
+        asset.childObjects(of: MDLMesh.self).first as? MDLMesh
+    ) else {
         return nil
     }
-    
+
     do {
         let mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
         return mtkMesh
     } catch {
         return nil
-    }
-}
-
-func printVertexData(mesh: MTKMesh) {
-    guard let vertexBuffer = mesh.vertexBuffers.first?.buffer else {
-        print("Error: No vertex buffer found in the mesh")
-        return
-    }
-    
-    let vertexCount = vertexBuffer.length / (MemoryLayout<Float>.stride * 6) // 6 floats for position and normal
-    let vertexData = vertexBuffer.contents().assumingMemoryBound(to: Float.self)
-    
-    print("Vertex data (Position [x, y, z], Normal [x, y, z]):")
-    for i in 0..<vertexCount {
-        let position = SIMD3<Float>(vertexData[6 * i], vertexData[6 * i + 1], vertexData[6 * i + 2])
-        let normal = SIMD3<Float>(vertexData[6 * i + 3], vertexData[6 * i + 4], vertexData[6 * i + 5])
-        print("Vertex \(i): Position: \(position), Normal: \(normal)")
     }
 }
 
@@ -68,12 +83,11 @@ class Renderer: NSObject, MTKViewDelegate {
     var commandQueue: MTLCommandQueue?
     
     var library: MTLLibrary
-    
-    let gridPipelineState: MTLRenderPipelineState
+
     var modelPipelineState: MTLRenderPipelineState? = nil
     
     let depthStencilState: MTLDepthStencilState
-    let vertexShaderUniformsBuffer: MTLBuffer
+    let uniformsBuffer: MTLBuffer
     
     var lastRenderTime: TimeInterval! = nil
     var currentTime: TimeInterval = 0.0
@@ -93,8 +107,6 @@ class Renderer: NSObject, MTKViewDelegate {
     }
     var mesh: MTKMesh? = nil
     
-    let gridVertexBuffer: MTLBuffer
-    
     var sceneData: SceneData
     
     init(_ parent: Viewport3DView, _ scene: SceneData) {
@@ -112,62 +124,6 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         self.library = library
         
-        let gridVertices: [Vertex] = [
-            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
-            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
-            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
-            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
-            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
-            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0))
-        ]
-        
-        if let buffer = device.makeBuffer(
-            bytes: gridVertices,
-            length: gridVertices.count * MemoryLayout<Vertex>.stride,
-            options: []
-        ) {
-            gridVertexBuffer = buffer
-        } else {
-            fatalError("failed to create vertex buffer")
-        }
-        
-        
-        
-        
-        let metalVertexDescriptor = MTLVertexDescriptor()
-
-        metalVertexDescriptor.attributes[0] = MTLVertexAttributeDescriptor()
-        metalVertexDescriptor.attributes[0].format = .float3
-        metalVertexDescriptor.attributes[0].offset = 0
-        metalVertexDescriptor.attributes[0].bufferIndex = 0
-
-        metalVertexDescriptor.attributes[1] = MTLVertexAttributeDescriptor()
-        metalVertexDescriptor.attributes[1].format = .float3
-        metalVertexDescriptor.attributes[1].offset = MemoryLayout<Float>.stride * 3
-        metalVertexDescriptor.attributes[1].bufferIndex = 0
-
-        metalVertexDescriptor.attributes[2] = MTLVertexAttributeDescriptor()
-        metalVertexDescriptor.attributes[2].format = .float3
-        metalVertexDescriptor.attributes[2].offset = MemoryLayout<Float>.stride * 6
-        metalVertexDescriptor.attributes[2].bufferIndex = 0
-
-        metalVertexDescriptor.layouts[0] = MTLVertexBufferLayoutDescriptor()
-        metalVertexDescriptor.layouts[0].stride = MemoryLayout<Float>.stride * 9
-        
-        
-        if let state = Renderer.createPipelineState(
-            device: device,
-            library: library,
-            vertexShaderName: "gridVertexShader",
-            fragmentShaderName: "gridFragmentShader",
-            alphaBlendingEnabled: true,
-            vertexDescriptor: metalVertexDescriptor
-        ) {
-            gridPipelineState = state
-        } else {
-            fatalError("failed to create pipeline state")
-        }
-        
         let depthDescriptor = MTLDepthStencilDescriptor()
         depthDescriptor.isDepthWriteEnabled = true
         depthDescriptor.depthCompareFunction = .less
@@ -179,10 +135,10 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         if let buffer = device.makeBuffer(
-            length: MemoryLayout<VertexShaderUniforms>.stride,
+            length: MemoryLayout<ShaderUniforms>.stride,
             options: .storageModeShared
         ) {
-            vertexShaderUniformsBuffer = buffer
+            uniformsBuffer = buffer
         } else {
             fatalError("failed to create uniforms buffer")
         }
@@ -226,7 +182,6 @@ class Renderer: NSObject, MTKViewDelegate {
             let pipelineState = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
             return pipelineState
         } catch {
-            // fatalError(error)
             print(error)
             return nil
         }
@@ -243,6 +198,7 @@ class Renderer: NSObject, MTKViewDelegate {
         self.mesh = model
         
         let vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(mesh!.vertexDescriptor)!
+        
         if let state = Renderer.createPipelineState(
             device: device,
             library: library,
@@ -258,35 +214,18 @@ class Renderer: NSObject, MTKViewDelegate {
     }
     
     func update(deltaTime: Float, aspect: Float) {
-        
-//
-//        let scaleFactor: Float32 = 1.0
-//        let scale = simd_float4x4(rows: [
-//            [scaleFactor,           0,           0, 0],
-//            [          0, scaleFactor,           0, 0],
-//            [          0,           0, scaleFactor, 0],
-//            [          0,           0,           0, 1],
-//        ])
-
-//        let pivot: Float = 0.0
-//        let radius: Float = 4.0
-//        let xCoord: Float = radius * cos(y_angle)
-//        let zCoord: Float = radius * sin(y_angle)
-//        camera.setPosition(Vec3(xCoord + pivot, 2, zCoord + pivot))
-//        camera.setView(targeting: Vec3(pivot, 0, pivot))
-//        camera.setOrthographicFocusPlane(radius)
-
-        var uniforms = VertexShaderUniforms(
+        var uniforms = ShaderUniforms(
             modelMatrix: simd_float4x4(1.0), // TRS
             viewMatrix: sceneData.camera.getViewMatrix(),
             inverseViewMatrix: sceneData.camera.getViewMatrix().inverse,
             projectionMatrix: sceneData.camera.getProjectionMatrix(),
             inverseProjectionMatrix: sceneData.camera.getProjectionMatrix().inverse,
             nearClip: sceneData.camera.nearClippingPlane,
-            farClip: sceneData.camera.farClippingPlane
+            farClip: sceneData.camera.farClippingPlane,
+            attributeSelector: sceneData.vertexColors
         )
         
-        memcpy(vertexShaderUniformsBuffer.contents(), &uniforms, MemoryLayout<VertexShaderUniforms>.stride)
+        memcpy(uniformsBuffer.contents(), &uniforms, MemoryLayout<ShaderUniforms>.stride)
     }
     
     func makeDefaultRenderPassDescriptor(for view: MTKView) -> MTLRenderPassDescriptor? {
@@ -328,12 +267,14 @@ class Renderer: NSObject, MTKViewDelegate {
         renderEncoder.setFrontFacing(.counterClockwise)
         renderEncoder.setCullMode(.back)
         
-        renderEncoder.setVertexBuffer(vertexShaderUniformsBuffer, offset: 0, index: 1)
-        renderEncoder.setFragmentBuffer(vertexShaderUniformsBuffer, offset: 0, index: 1)
+        renderEncoder.setVertexBuffer(uniformsBuffer, offset: 0, index: 1)
+        renderEncoder.setFragmentBuffer(uniformsBuffer, offset: 0, index: 1)
 
         if self.mesh != nil {
             renderEncoder.setRenderPipelineState(modelPipelineState!)
             renderEncoder.setVertexBuffer(mesh!.vertexBuffers[0].buffer, offset: 0, index: 0)
+            
+            renderEncoder.setTriangleFillMode(.fill)
             for submesh in mesh!.submeshes {
                 renderEncoder.drawIndexedPrimitives(
                     type: submesh.primitiveType,
@@ -344,14 +285,49 @@ class Renderer: NSObject, MTKViewDelegate {
                 )
             }
         }
-
-        renderEncoder.setRenderPipelineState(gridPipelineState)
-        renderEncoder.setVertexBuffer(gridVertexBuffer, offset: 0, index: 0)
-        renderEncoder.setTriangleFillMode(.fill)
-        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         
         renderEncoder.endEncoding();
         commandBuffer.present(drawable)
         commandBuffer.commit()
+    }
+    
+    private var panSensitivity: Float32 = 1.0
+    
+    
+    @objc func handlePanGesture(_ gestureRecognizer: NSPanGestureRecognizer) {
+        let translation = gestureRecognizer.translation(in: gestureRecognizer.view)
+
+        if gestureRecognizer.state == .ended {
+            sceneData.lastMouseLocation = nil
+            sceneData.mouseDelta = Vec2(0, 0)
+        } else {
+            let currentMouseLocation = Vec2(Float32(translation.x), Float32(-translation.y))
+            if let lastMouseLocation = sceneData.lastMouseLocation {
+                let mouseDelta = (currentMouseLocation - lastMouseLocation) * panSensitivity
+                if abs(mouseDelta.x) > 0.0001 && abs(mouseDelta.y) > 0.0001 {
+                    sceneData.mouseDelta = mouseDelta
+                } else {
+                    sceneData.mouseDelta = Vec2(0, 0)
+                }
+            }
+            sceneData.lastMouseLocation = currentMouseLocation
+        }
+    }
+    
+    private let minValue: Float32 = 0.5
+    private let maxValue: Float32 = 2.0
+    private var currentScale: Float32 = 1.0
+    private var sensitivity: Float32 = 0.01
+    
+    @objc func handleMagnificationGesture(_ gestureRecognizer: NSMagnificationGestureRecognizer) {
+        let magnification = Float32(gestureRecognizer.magnification) * sensitivity
+        let scaleFactor = 1.0 + magnification
+        let newScale = currentScale * scaleFactor
+        
+        let newScaleClamped = min(max(newScale, minValue), maxValue)
+         
+        currentScale = newScaleClamped
+        
+        sceneData.cameraDistance = ((currentScale - minValue) / (maxValue - minValue)) * (sceneData.minCameraDistance - sceneData.maxCameraDistance) + sceneData.maxCameraDistance
     }
 }

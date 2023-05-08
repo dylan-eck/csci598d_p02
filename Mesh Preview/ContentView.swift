@@ -13,16 +13,22 @@ struct ContentView: View {
                         Text("triangle count")
                     }
                 }
-                
+
                 DisclosureGroup("Viewport Settings") {
-                    
+
                 }
-                
+
                 DisclosureGroup("Camera Settings") {
                     Button(action: {sceneData.toggleProjection()}) {
                         Text("toggle projection")
                     }
                 }
+//                
+//                Picker("Vertex Colors", selection: $sceneData.vertexColors) {
+//                    ForEach(0..<sceneData.vertexColorOptions.count) { index in
+//                        Text("\(sceneData.vertexColorOptions[index])").tag(index)
+//                    }
+//                }
             }
                 .frame(maxHeight: .infinity)
                 .backgroundStyle(.opacity(0))
@@ -34,23 +40,9 @@ struct ContentView: View {
                         }
                     }
                 }
-            
+
             Viewport3DView()
                 .ignoresSafeArea()
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            let mouseLocation = Vec2(Float32(value.location.x), Float32(value.location.y))
-                            if let lastLocation = sceneData.lastMouseLocation {
-                                sceneData.mouseDelta = mouseLocation - lastLocation
-                            }
-                            sceneData.lastMouseLocation = mouseLocation
-                        }
-                        .onEnded { value in
-                            sceneData.mouseDelta = Vec2(0, 0)
-                            sceneData.lastMouseLocation = nil
-                        }
-                )
         }
             .frame(idealWidth: 400)
            

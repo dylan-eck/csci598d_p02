@@ -1,7 +1,15 @@
-#ifndef defines_h
-#define defines_h
+#ifndef definitions_h
+#define definitions_h
 
-#include <simd/simd.h>
+#import <simd/simd.h>
+
+typedef enum {
+    VertexAttributeNone = 0,
+    VertexAttributePosition = 1,
+    VertexAttributeColor = 2,
+    VertexAttributeNormal = 3,
+    VertexAttributeTexCoord = 4
+} VertexAttribute;
 
 struct Vertex {
     vector_float3 position;
@@ -9,7 +17,7 @@ struct Vertex {
     vector_float3 normal;
 };
 
-struct VertexShaderUniforms {
+struct ShaderUniforms {
     simd_float4x4 modelMatrix;
     simd_float4x4 viewMatrix;
     simd_float4x4 inverseViewMatrix;
@@ -17,6 +25,7 @@ struct VertexShaderUniforms {
     simd_float4x4 inverseProjectionMatrix;
     float nearClip;
     float farClip;
+    uint attributeSelector;
 };
 
-#endif /* defines_h */
+#endif
