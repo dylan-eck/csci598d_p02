@@ -48,8 +48,6 @@ extension MDLVertexDescriptor {
     }
 }
 
-
-
 func loadModel(from url: URL, to device: MTLDevice) -> MTKMesh? {
     
     let bufferAllocator = MTKMeshBufferAllocator(device: device)
@@ -64,9 +62,12 @@ func loadModel(from url: URL, to device: MTLDevice) -> MTKMesh? {
     ) else {
         return nil
     }
+    
+    print(mdlMesh.vertexCount)
 
     do {
         let mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
+        
         return mtkMesh
     } catch {
         return nil
@@ -196,9 +197,9 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         self.mesh = model
-        
+
         let vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(mesh!.vertexDescriptor)!
-        
+
         if let state = Renderer.createPipelineState(
             device: device,
             library: library,
@@ -228,9 +229,15 @@ class Renderer: NSObject, MTKViewDelegate {
         memcpy(uniformsBuffer.contents(), &uniforms, MemoryLayout<ShaderUniforms>.stride)
     }
     
-    func makeDefaultRenderPassDescriptor(for view: MTKView) -> MTLRenderPassDescriptor? {
+    func makeRenderPassDescriptor(for view: MTKView, clearColor: Vec3 = Vec3(1.0, 0.0, 1.0)) -> MTLRenderPassDescriptor? {
         if let renderPassDescriptor = view.currentRenderPassDescriptor {
-            renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.1, 0.1, 0.1, 1.0)
+            renderPassDescriptor.colorAttachments[0].clearColor =
+            MTLClearColorMake(
+                Double(clearColor.x),
+                Double(clearColor.y),
+                Double(clearColor.z),
+                1.0
+            )
             renderPassDescriptor.colorAttachments[0].loadAction = .clear
             renderPassDescriptor.colorAttachments[0].storeAction = .store
             
@@ -254,10 +261,16 @@ class Renderer: NSObject, MTKViewDelegate {
             viewHeight: Float32(view.drawableSize.height))
         update(deltaTime: Float(deltaTime), aspect: aspect)
         
+        let clearColor = Vec3(
+            sceneData.backgroundColor.x,
+            sceneData.backgroundColor.y,
+            sceneData.backgroundColor.z
+        )
+        
         guard
             let drawable = view.currentDrawable,
             let commandBuffer = commandQueue?.makeCommandBuffer(),
-            let renderPassDescriptor = makeDefaultRenderPassDescriptor(for: view),
+            let renderPassDescriptor = makeRenderPassDescriptor(for: view, clearColor: clearColor),
             let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
         else {
             return

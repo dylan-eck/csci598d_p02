@@ -7,17 +7,48 @@
 
 import Foundation
 
+struct vertexColoringOption: Identifiable {
+    var name: String
+    var id: UInt32
+}
+
+func fileSize(atURL url: URL) -> Int? {
+    do {
+        let resourceValues = try url.resourceValues(forKeys: Set([URLResourceKey.fileSizeKey]))
+        if let size = resourceValues.fileSize {
+            return size
+        }
+    } catch {
+        
+    }
+    return nil
+}
+
 class SceneData: ObservableObject {
+    @Published var modelURL: URL?
+    
+    @Published var modelFileSize: Int? = nil
+    
     @Published var camera = Camera()
     @Published var lastMouseLocation: Vec2? = nil
     @Published var mouseDelta = Vec2(0, 0)
-    @Published var modelURL: URL? = nil
-
+    
     var cameraDistance: Float32 = 1.0
     @Published var minCameraDistance: Float32 = 0.1
     @Published var maxCameraDistance: Float32 = 100.0
     
+    @Published var backgroundColor: Vec3 = Vec3(1.0, 0.0, 1.0)
+    
     @Published var vertexColors: UInt32 = VertexAttributeColor.rawValue
+    var vertexColoringOptions = [
+        vertexColoringOption(name: "None", id: VertexAttributeNone.rawValue),
+        vertexColoringOption(name: "Position", id: VertexAttributePosition.rawValue),
+        vertexColoringOption(name: "Color", id: VertexAttributeColor.rawValue),
+        vertexColoringOption(name: "Normal", id: VertexAttributeNormal.rawValue),
+        vertexColoringOption(name: "Texture Coordinate", id: VertexAttributeTexCoord.rawValue)
+    ]
+    
+
     
     init() {
         camera.position = Vec3(0, 2, 4)
@@ -26,6 +57,26 @@ class SceneData: ObservableObject {
         camera.projection = .perspective
         
         cameraDistance = sqrt(dot(camera.position, camera.position))
+        
+        if let modelURLBookmark = UserDefaults.standard.data(forKey: UserDefaults.lastURLBookmarkKey) {
+            do {
+                var isStale = false
+                let bookmarkURL = try URL(
+                    resolvingBookmarkData: modelURLBookmark,
+                    options: [.withSecurityScope, .withoutUI],
+                    relativeTo: nil,
+                    bookmarkDataIsStale: &isStale
+                )
+
+                if !isStale && bookmarkURL.startAccessingSecurityScopedResource() {
+                    modelURL = bookmarkURL
+                    bookmarkURL.stopAccessingSecurityScopedResource()
+                }
+            } catch {
+                print("failed to resolve model url bookmark: \(error)")
+            }
+        }
+        
     }
     
     func toggleProjection() {

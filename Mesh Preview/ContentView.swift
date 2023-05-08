@@ -1,34 +1,30 @@
 import SwiftUI
 import MetalKit
 
+func formattedFileSize(fromBytes bytes: Int) -> String {
+    let byteCountFormatter = ByteCountFormatter()
+    byteCountFormatter.allowedUnits = [.useBytes, .useKB, .useMB, .useGB]
+    byteCountFormatter.countStyle = .file
+    return byteCountFormatter.string(fromByteCount: Int64(bytes))
+}
+
 struct ContentView: View {
+    @Environment(\.colorScheme) var colorScheme
+
     @EnvironmentObject var sceneData: SceneData
 
     var body: some View {
         NavigationView {
             List {
-                DisclosureGroup("Mesh Info") {
-                    VStack(alignment: .leading) {
-                        Text("vertex count")
-                        Text("triangle count")
+                MeshInfoView()
+                DisplayOptionsView()
+                CameraSettingsView()
+
+                Picker("Vertex Colors", selection: $sceneData.vertexColors) {
+                    ForEach(sceneData.vertexColoringOptions) { option in
+                        Text(option.name).tag(option.id)
                     }
                 }
-
-                DisclosureGroup("Viewport Settings") {
-
-                }
-
-                DisclosureGroup("Camera Settings") {
-                    Button(action: {sceneData.toggleProjection()}) {
-                        Text("toggle projection")
-                    }
-                }
-//                
-//                Picker("Vertex Colors", selection: $sceneData.vertexColors) {
-//                    ForEach(0..<sceneData.vertexColorOptions.count) { index in
-//                        Text("\(sceneData.vertexColorOptions[index])").tag(index)
-//                    }
-//                }
             }
                 .frame(maxHeight: .infinity)
                 .backgroundStyle(.opacity(0))
@@ -41,14 +37,33 @@ struct ContentView: View {
                     }
                 }
 
-            Viewport3DView()
-                .ignoresSafeArea()
+            GeometryReader { geometry in
+                 Viewport3DView()
+                    .ignoresSafeArea()
+                    .onAppear {
+                        if let color = NSColor.windowBackgroundColor.usingColorSpace(.deviceRGB) {
+                            sceneData.backgroundColor = Vec3(
+                                Float32(color.redComponent),
+                                Float32(color.greenComponent),
+                                Float32(color.blueComponent)
+                            )
+                        }
+                    }
+                    .onChange(of: colorScheme) { _ in
+                        if let color = NSColor.windowBackgroundColor.usingColorSpace(.deviceRGB) {
+                            sceneData.backgroundColor = Vec3(
+                                Float32(color.redComponent),
+                                Float32(color.greenComponent),
+                                Float32(color.blueComponent)
+                            )
+                        }
+                    }
+            }
         }
             .frame(idealWidth: 400)
-           
     }
     
-    private func toggleSidebar() { // 2
+    private func toggleSidebar() {
         NSApp.keyWindow?.firstResponder?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
     }
 }

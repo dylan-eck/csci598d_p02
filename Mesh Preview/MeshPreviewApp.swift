@@ -17,8 +17,18 @@ struct MeshPreviewApp: App {
                         let panel = NSOpenPanel()
                         panel.allowsMultipleSelection = false
                         panel.canChooseDirectories = false
-                        if panel.runModal() == .OK {
-                            sceneData.modelURL = panel.url
+                        if panel.runModal() == .OK, let url = panel.url {
+                            sceneData.modelURL = url
+                            do {
+                                let bookmarkData = try url.bookmarkData(
+                                    options: [.withSecurityScope],
+                                    includingResourceValuesForKeys: nil,
+                                    relativeTo: nil
+                                )
+                                UserDefaults.standard.set(bookmarkData, forKey: UserDefaults.lastURLBookmarkKey)
+                            } catch {
+                                print("error creating model url bookmark: \(error)")
+                            }
                         }
                     }.keyboardShortcut("o", modifiers: .command)
                 }

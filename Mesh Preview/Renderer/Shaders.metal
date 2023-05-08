@@ -13,6 +13,7 @@ struct VertexIn {
 struct VertexOut {
     float4 position [[position]];
     float4 color;
+    float3 normal;
 };
 
 vertex VertexOut vertexShader(
@@ -22,6 +23,8 @@ vertex VertexOut vertexShader(
 
     VertexOut output;
     output.position = uniforms.projectionMatrix * uniforms.viewMatrix * uniforms.modelMatrix * vertex_in.position;
+
+    output.normal = vertex_in.normal;
 
     switch (uniforms.attributeSelector) {
     case VertexAttributePosition:
@@ -44,7 +47,17 @@ vertex VertexOut vertexShader(
 }
 
 fragment float4 fragmentShader(VertexOut input [[stage_in]]) {
-    return input.color;
+    float3 lightPosition = float3(0.0, -2.0, 0.0);
+    float3 directionToLight = normalize(-lightPosition);
+    
+    float3 light;
+    
+    float ambientItensity = 0.5;
+    float diffuseIntensity = max(dot(input.normal, directionToLight), 0.0);
+    
+    light = diffuseIntensity * float3(0.0, 0.0, 1.0) + ambientItensity * float3(1.0, 0.0, 0.0);
+
+    return float4(light, 1.0);
 }
 
 
