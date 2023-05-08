@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct MeshPreviewApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @StateObject var sceneData = SceneData()
 
     var body: some Scene {

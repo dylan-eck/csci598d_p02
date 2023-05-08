@@ -1,10 +1,3 @@
-//
-//  SceneDataModel.swift
-//  CSCI598D_P02_ECK
-//
-//  Created by Dylan Eck on 4/15/23.
-//
-
 import Foundation
 
 struct vertexColoringOption: Identifiable {
@@ -25,11 +18,16 @@ func fileSize(atURL url: URL) -> Int? {
 }
 
 class SceneData: ObservableObject {
-    @Published var modelURL: URL?
-    
+    @Published var modelURL: URL? {
+        didSet {
+            if let url = modelURL {
+                modelFileSize = fileSize(atURL: url)
+            }
+        }
+    }
     @Published var modelFileSize: Int? = nil
     
-    @Published var camera = Camera()
+    var camera = Camera()
     @Published var lastMouseLocation: Vec2? = nil
     @Published var mouseDelta = Vec2(0, 0)
     
@@ -47,8 +45,6 @@ class SceneData: ObservableObject {
         vertexColoringOption(name: "Normal", id: VertexAttributeNormal.rawValue),
         vertexColoringOption(name: "Texture Coordinate", id: VertexAttributeTexCoord.rawValue)
     ]
-    
-
     
     init() {
         camera.position = Vec3(0, 2, 4)
