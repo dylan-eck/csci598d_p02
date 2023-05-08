@@ -11,7 +11,7 @@ func formattedFileSize(fromBytes bytes: Int) -> String {
 struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
 
-    @EnvironmentObject var sceneData: SceneData
+    @EnvironmentObject var viewModel: ViewModel
 
     var body: some View {
         NavigationView {
@@ -20,8 +20,8 @@ struct ContentView: View {
                 DisplayOptionsView()
                 CameraSettingsView()
 
-                Picker("Vertex Colors", selection: $sceneData.vertexColors) {
-                    ForEach(sceneData.vertexColoringOptions) { option in
+                Picker("Vertex Colors", selection: $viewModel.vertexColors) {
+                    ForEach(viewModel.vertexColoringOptions) { option in
                         Text(option.name).tag(option.id)
                     }
                 }
@@ -42,7 +42,7 @@ struct ContentView: View {
                     .ignoresSafeArea()
                     .onAppear {
                         if let color = NSColor.windowBackgroundColor.usingColorSpace(.deviceRGB) {
-                            sceneData.backgroundColor = Vec3(
+                            viewModel.backgroundColor = Vec3(
                                 Float32(color.redComponent),
                                 Float32(color.greenComponent),
                                 Float32(color.blueComponent)
@@ -51,7 +51,7 @@ struct ContentView: View {
                     }
                     .onChange(of: colorScheme) { _ in
                         if let color = NSColor.windowBackgroundColor.usingColorSpace(.deviceRGB) {
-                            sceneData.backgroundColor = Vec3(
+                            viewModel.backgroundColor = Vec3(
                                 Float32(color.redComponent),
                                 Float32(color.greenComponent),
                                 Float32(color.blueComponent)

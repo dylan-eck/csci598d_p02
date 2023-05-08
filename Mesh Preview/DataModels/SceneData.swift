@@ -17,15 +17,9 @@ func fileSize(atURL url: URL) -> Int? {
     return nil
 }
 
-class SceneData: ObservableObject {
-    @Published var modelURL: URL? {
-        didSet {
-            if let url = modelURL {
-                modelFileSize = fileSize(atURL: url)
-            }
-        }
-    }
-    @Published var modelFileSize: Int? = nil
+class SceneData {
+    var modelURL: URL?
+    var modelFileSize: Int? = nil
     
     var camera = Camera()
     var lastMouseLocation: Vec2? = nil
@@ -35,8 +29,8 @@ class SceneData: ObservableObject {
     var minCameraDistance: Float32 = 0.1
     var maxCameraDistance: Float32 = 100.0
     
-    @Published var backgroundColor: Vec3 = Vec3(1.0, 0.0, 1.0)
-    @Published var vertexColors: UInt32 = VertexAttributeColor.rawValue
+    var backgroundColor: Vec3 = Vec3(1.0, 0.0, 1.0)
+    var vertexColors: UInt32 = VertexAttributeColor.rawValue
     
     
     var vertexColoringOptions = [

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MeshInfoView: View {
-    @EnvironmentObject var sceneData: SceneData
+    @EnvironmentObject var viewModel: ViewModel
     
     @State private var isExpanded = false
     
@@ -15,7 +15,7 @@ struct MeshInfoView: View {
 
                         Spacer()
 
-                        if let size = sceneData.modelFileSize {
+                        if let size = viewModel.modelFileSize {
                             Text(formattedFileSize(fromBytes: size))
                         }
                     }

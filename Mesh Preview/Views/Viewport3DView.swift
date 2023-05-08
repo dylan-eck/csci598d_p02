@@ -4,10 +4,10 @@ import SwiftUI
 import MetalKit
 
 struct Viewport3DView: NSViewRepresentable {
-    @EnvironmentObject var sceneData: SceneData
+    @EnvironmentObject var viewModel: ViewModel
 
     func makeCoordinator() -> Renderer {
-        Renderer(self, sceneData)
+        Renderer(self, viewModel.sceneData)
     }
     
     func makeNSView(context: NSViewRepresentableContext<Viewport3DView>) -> MTKView {

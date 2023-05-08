@@ -4,12 +4,12 @@ import SwiftUI
 struct MeshPreviewApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @StateObject var sceneData = SceneData()
+    @StateObject var viewModel = ViewModel()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(sceneData)
+                .environmentObject(viewModel)
                 .ignoresSafeArea()
         }
             .windowStyle(HiddenTitleBarWindowStyle())
@@ -20,7 +20,7 @@ struct MeshPreviewApp: App {
                         panel.allowsMultipleSelection = false
                         panel.canChooseDirectories = false
                         if panel.runModal() == .OK, let url = panel.url {
-                            sceneData.modelURL = url
+                            viewModel.modelURL = url
                             do {
                                 let bookmarkData = try url.bookmarkData(
                                     options: [.withSecurityScope],

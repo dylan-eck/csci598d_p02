@@ -1,25 +1,38 @@
 import SwiftUI
 
 class ViewModel: ObservableObject {
-    @Published var sceneData = SceneData()
+    var sceneData = SceneData()
     
-    var modelURL: URL? {
-        get { sceneData.modelURL }
-        set { sceneData.modelURL = newValue }
+    @Published var modelURL: URL? {
+        didSet {
+            if let url = modelURL {
+                sceneData.modelURL = url
+                modelFileSize = fileSize(atURL: url)
+            }
+        }
     }
     
-    var modelFileSize: Int? {
-        get { sceneData.modelFileSize }
-        set { sceneData.modelFileSize = newValue }
+    @Published private(set) var modelFileSize: Int?
+    
+    @Published var backgroundColor: Vec3 {
+        didSet {
+            sceneData.backgroundColor = backgroundColor
+        }
     }
     
-    var backgroundColor: Vec3 {
-        get { sceneData.backgroundColor }
-        set { sceneData.backgroundColor = newValue }
+    @Published var vertexColors: UInt32 {
+        didSet {
+            sceneData.vertexColors = vertexColors
+        }
     }
     
-    var vertexColors: UInt32 {
-        get { sceneData.vertexColors }
-        set { sceneData.vertexColors = newValue }
+    @Published private(set) var vertexColoringOptions: [vertexColoringOption]
+    
+    init(scene: SceneData = SceneData()) {
+        self.modelURL = sceneData.modelURL
+        self.modelFileSize = sceneData.modelFileSize
+        self.backgroundColor = sceneData.backgroundColor
+        self.vertexColors = sceneData.vertexColors
+        self.vertexColoringOptions = sceneData.vertexColoringOptions
     }
 }

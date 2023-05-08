@@ -62,8 +62,6 @@ func loadModel(from url: URL, to device: MTLDevice) -> MTKMesh? {
     ) else {
         return nil
     }
-    
-    print(mdlMesh.vertexCount)
 
     do {
         let mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
@@ -103,7 +101,6 @@ class Renderer: NSObject, MTKViewDelegate {
 
     var modelURL: URL? = nil {
         didSet {
-            if let url = modelURL { print(url )}
             prepareModelResources()
         }
     }

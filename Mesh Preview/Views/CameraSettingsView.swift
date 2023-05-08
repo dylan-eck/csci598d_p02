@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct CameraSettingsView: View {
-    @EnvironmentObject var sceneData: SceneData
+    @EnvironmentObject var viewModel: ViewModel
     
     var body: some View {
         DisclosureGroup(
             content: {
-                Button(action: {sceneData.toggleProjection()}) {
+                Button(action: {viewModel.sceneData.toggleProjection()}) {
                     Text("toggle projection")
                 }
             },
