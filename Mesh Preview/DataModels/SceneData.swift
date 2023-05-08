@@ -28,16 +28,17 @@ class SceneData: ObservableObject {
     @Published var modelFileSize: Int? = nil
     
     var camera = Camera()
-    @Published var lastMouseLocation: Vec2? = nil
-    @Published var mouseDelta = Vec2(0, 0)
+    var lastMouseLocation: Vec2? = nil
+    var mouseDelta = Vec2(0, 0)
     
     var cameraDistance: Float32 = 1.0
-    @Published var minCameraDistance: Float32 = 0.1
-    @Published var maxCameraDistance: Float32 = 100.0
+    var minCameraDistance: Float32 = 0.1
+    var maxCameraDistance: Float32 = 100.0
     
     @Published var backgroundColor: Vec3 = Vec3(1.0, 0.0, 1.0)
-    
     @Published var vertexColors: UInt32 = VertexAttributeColor.rawValue
+    
+    
     var vertexColoringOptions = [
         vertexColoringOption(name: "None", id: VertexAttributeNone.rawValue),
         vertexColoringOption(name: "Position", id: VertexAttributePosition.rawValue),

@@ -103,6 +103,7 @@ class Renderer: NSObject, MTKViewDelegate {
 
     var modelURL: URL? = nil {
         didSet {
+            if let url = modelURL { print(url )}
             prepareModelResources()
         }
     }
@@ -251,7 +252,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let deltaTime = (lastRenderTime == nil) ? 0 : (systemTime - lastRenderTime!)
         lastRenderTime = systemTime
         
-        if let url = sceneData.modelURL, self.modelURL == nil{
+        if let url = sceneData.modelURL, url != self.modelURL {
             self.modelURL = url
         }
         

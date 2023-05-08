@@ -18,6 +18,7 @@
 		249C1DBC2A0999310024560A /* DisplayOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C1DBB2A0999310024560A /* DisplayOptionsView.swift */; };
 		249C1DBE2A09A0EF0024560A /* LinAlgEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C1DBD2A09A0EF0024560A /* LinAlgEncoding.swift */; };
 		249C1DC02A09A9070024560A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C1DBF2A09A9070024560A /* AppDelegate.swift */; };
+		249C1DC32A09B1B70024560A /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C1DC22A09B1B70024560A /* ViewModel.swift */; };
 		24B6B75029E6FD9400EDEDF5 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B6B74F29E6FD9400EDEDF5 /* Camera.swift */; };
 		24B6B75629E76F7F00EDEDF5 /* suzanne.obj in Resources */ = {isa = PBXBuildFile; fileRef = 24B6B75529E76F7F00EDEDF5 /* suzanne.obj */; };
 		24B6B75A29E8AA1100EDEDF5 /* LinAlg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B6B75929E8AA1100EDEDF5 /* LinAlg.swift */; };
@@ -43,6 +44,7 @@
 		249C1DBB2A0999310024560A /* DisplayOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayOptionsView.swift; sourceTree = "<group>"; };
 		249C1DBD2A09A0EF0024560A /* LinAlgEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinAlgEncoding.swift; sourceTree = "<group>"; };
 		249C1DBF2A09A9070024560A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		249C1DC22A09B1B70024560A /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		24B6B74F29E6FD9400EDEDF5 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		24B6B75529E76F7F00EDEDF5 /* suzanne.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = suzanne.obj; sourceTree = "<group>"; };
 		24B6B75929E8AA1100EDEDF5 /* LinAlg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinAlg.swift; sourceTree = "<group>"; };
@@ -110,6 +112,14 @@
 			path = Renderer;
 			sourceTree = "<group>";
 		};
+		249C1DC12A09B1A50024560A /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				249C1DC22A09B1B70024560A /* ViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		24B6B75229E7461E00EDEDF5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -138,6 +148,7 @@
 				24BB1BC029E11CB7004C1C06 /* ContentView.swift */,
 				249C1DB92A097F740024560A /* UserDefaults.swift */,
 				248A97AE29E4AD0300275F9A /* Views */,
+				249C1DC12A09B1A50024560A /* ViewModels */,
 				24B6B75B29EA877300EDEDF5 /* DataModels */,
 				248A97B129E4AF8E00275F9A /* Renderer */,
 				24B6B75229E7461E00EDEDF5 /* Resources */,
@@ -240,6 +251,7 @@
 				249C1DC02A09A9070024560A /* AppDelegate.swift in Sources */,
 				249C1DB62A09760E0024560A /* CameraSettingsView.swift in Sources */,
 				249C1DBE2A09A0EF0024560A /* LinAlgEncoding.swift in Sources */,
+				249C1DC32A09B1B70024560A /* ViewModel.swift in Sources */,
 				249C1DBA2A097F740024560A /* UserDefaults.swift in Sources */,
 				24BB1BC729E11CB7004C1C06 /* Renderer.swift in Sources */,
 				24BB1BC429E11CB7004C1C06 /* Shaders.metal in Sources */,
