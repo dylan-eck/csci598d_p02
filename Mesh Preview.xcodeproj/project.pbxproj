@@ -37,7 +37,6 @@
 		2426B4F12A06EE63005E6F82 /* plane_color.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = plane_color.obj; sourceTree = "<group>"; };
 		2426B4F32A06EE68005E6F82 /* plane.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = plane.obj; sourceTree = "<group>"; };
 		248A97AF29E4AD1400275F9A /* Viewport3DView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Viewport3DView.swift; sourceTree = "<group>"; };
-		249C1DB22A087F010024560A /* shared.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shared.h; sourceTree = "<group>"; };
 		249C1DB32A0975730024560A /* MeshInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshInfoView.swift; sourceTree = "<group>"; };
 		249C1DB52A09760E0024560A /* CameraSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSettingsView.swift; sourceTree = "<group>"; };
 		249C1DB92A097F740024560A /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
@@ -102,7 +101,6 @@
 			isa = PBXGroup;
 			children = (
 				24BB1BBE29E11CB7004C1C06 /* definitions.h */,
-				249C1DB22A087F010024560A /* shared.h */,
 				24BB1BBB29E11CB7004C1C06 /* Shaders.metal */,
 				24BB1BC129E11CB7004C1C06 /* Renderer.swift */,
 				24B6B74F29E6FD9400EDEDF5 /* Camera.swift */,

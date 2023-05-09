@@ -3,8 +3,11 @@ import SwiftUI
 struct CameraSettingsView: View {
     @EnvironmentObject var viewModel: ViewModel
     
+    @State private var isExpanded = true
+    
     var body: some View {
         DisclosureGroup(
+            isExpanded: $isExpanded,
             content: {
                 Button(action: {viewModel.sceneData.toggleProjection()}) {
                     Text("toggle projection")

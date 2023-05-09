@@ -19,12 +19,6 @@ struct ContentView: View {
                 MeshInfoView()
                 DisplayOptionsView()
                 CameraSettingsView()
-
-                Picker("Vertex Colors", selection: $viewModel.vertexColors) {
-                    ForEach(viewModel.vertexColoringOptions) { option in
-                        Text(option.name).tag(option.id)
-                    }
-                }
             }
                 .frame(maxHeight: .infinity)
                 .backgroundStyle(.opacity(0))

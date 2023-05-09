@@ -7,7 +7,7 @@ struct Viewport3DView: NSViewRepresentable {
     @EnvironmentObject var viewModel: ViewModel
 
     func makeCoordinator() -> Renderer {
-        Renderer(self, viewModel.sceneData)
+        Renderer(self, viewModel)
     }
     
     func makeNSView(context: NSViewRepresentableContext<Viewport3DView>) -> MTKView {

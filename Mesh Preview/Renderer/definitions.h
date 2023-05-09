@@ -25,6 +25,7 @@ struct ShaderUniforms {
     simd_float4x4 inverseProjectionMatrix;
     float nearClip;
     float farClip;
+    simd_float3 lightPosition;
     uint attributeSelector;
 };
 

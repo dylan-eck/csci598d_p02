@@ -48,30 +48,6 @@ extension MDLVertexDescriptor {
     }
 }
 
-func loadModel(from url: URL, to device: MTLDevice) -> MTKMesh? {
-    
-    let bufferAllocator = MTKMeshBufferAllocator(device: device)
-    let asset = MDLAsset(
-        url: url,
-        vertexDescriptor: MDLVertexDescriptor.defaultDescriptor,
-        bufferAllocator: bufferAllocator
-    )
-    
-    guard let mdlMesh = (
-        asset.childObjects(of: MDLMesh.self).first as? MDLMesh
-    ) else {
-        return nil
-    }
-
-    do {
-        let mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
-        
-        return mtkMesh
-    } catch {
-        return nil
-    }
-}
-
 enum RenderDeviceBufferError: Error {
     case creationFailed
 }
@@ -83,6 +59,7 @@ class Renderer: NSObject, MTKViewDelegate {
     
     var library: MTLLibrary
 
+    let gridPipelineState: MTLRenderPipelineState
     var modelPipelineState: MTLRenderPipelineState? = nil
     
     let depthStencilState: MTLDepthStencilState
@@ -106,11 +83,15 @@ class Renderer: NSObject, MTKViewDelegate {
     }
     var mesh: MTKMesh? = nil
     
+    let gridVertexBuffer: MTLBuffer
+    
+    var viewModel: ViewModel
     var sceneData: SceneData
     
-    init(_ parent: Viewport3DView, _ scene: SceneData) {
+    init(_ parent: Viewport3DView, _ viewModel: ViewModel) {
         self.parent = parent
-        self.sceneData = scene
+        self.viewModel = viewModel
+        self.sceneData = viewModel.sceneData
         
         guard let device = MTLCreateSystemDefaultDevice() else {
             fatalError("failed to get default metal device")
@@ -122,6 +103,58 @@ class Renderer: NSObject, MTKViewDelegate {
             fatalError("failed to create default metal library")
         }
         self.library = library
+        
+        let gridVertices: [Vertex] = [
+            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
+            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
+            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
+            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
+            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0)),
+            Vertex(position: Vec3(0), color: Vec3(1), normal: Vec3(0))
+        ]
+        
+        if let buffer = device.makeBuffer(
+            bytes: gridVertices,
+            length: gridVertices.count * MemoryLayout<Vertex>.stride,
+            options: []
+        ) {
+            gridVertexBuffer = buffer
+        } else {
+            fatalError("failed to create vertex buffer")
+        }
+        
+        let metalVertexDescriptor = MTLVertexDescriptor()
+
+        metalVertexDescriptor.attributes[0] = MTLVertexAttributeDescriptor()
+        metalVertexDescriptor.attributes[0].format = .float3
+        metalVertexDescriptor.attributes[0].offset = 0
+        metalVertexDescriptor.attributes[0].bufferIndex = 0
+
+        metalVertexDescriptor.attributes[1] = MTLVertexAttributeDescriptor()
+        metalVertexDescriptor.attributes[1].format = .float3
+        metalVertexDescriptor.attributes[1].offset = MemoryLayout<Float>.stride * 3
+        metalVertexDescriptor.attributes[1].bufferIndex = 0
+
+        metalVertexDescriptor.attributes[2] = MTLVertexAttributeDescriptor()
+        metalVertexDescriptor.attributes[2].format = .float3
+        metalVertexDescriptor.attributes[2].offset = MemoryLayout<Float>.stride * 6
+        metalVertexDescriptor.attributes[2].bufferIndex = 0
+
+        metalVertexDescriptor.layouts[0] = MTLVertexBufferLayoutDescriptor()
+        metalVertexDescriptor.layouts[0].stride = MemoryLayout<Float>.stride * 9
+        
+        if let state = Renderer.createPipelineState(
+            device: device,
+            library: library,
+            vertexShaderName: "gridVertexShader",
+            fragmentShaderName: "gridFragmentShader",
+            alphaBlendingEnabled: true,
+            vertexDescriptor: metalVertexDescriptor
+        ) {
+            gridPipelineState = state
+        } else {
+            fatalError("failed to create pipeline state")
+        }
         
         let depthDescriptor = MTLDepthStencilDescriptor()
         depthDescriptor.isDepthWriteEnabled = true
@@ -186,6 +219,57 @@ class Renderer: NSObject, MTKViewDelegate {
         }
     }
     
+    func getStatistic(from asset: MDLAsset) {
+        var totalVertices = 0
+        var totalTriangles = 0
+
+        for object in asset.childObjects(of: MDLMesh.self) {
+            if let mesh = object as? MDLMesh {
+                let vertexCount = mesh.vertexCount
+                totalVertices += vertexCount
+
+                var triangleCount = 0
+                for submeshIndex in 0..<mesh.submeshes!.count {
+                    let submesh = mesh.submeshes![submeshIndex] as! MDLSubmesh
+                    if submesh.geometryType == .triangles {
+                        triangleCount += submesh.indexCount / 3
+                    }
+                }
+                totalTriangles += triangleCount
+            }
+        }
+        
+        viewModel.numVertices = totalVertices
+        viewModel.numTriangles = totalTriangles
+    }
+    
+    func loadModel(from url: URL, to device: MTLDevice) -> MTKMesh? {
+        let bufferAllocator = MTKMeshBufferAllocator(device: device)
+        let asset = MDLAsset(
+            url: url,
+            vertexDescriptor: MDLVertexDescriptor.defaultDescriptor,
+            bufferAllocator: bufferAllocator
+        )
+        
+        let size = fileSize(atURL: url)
+        viewModel.modelFileSize = size
+        getStatistic(from: asset)
+        
+        guard let mdlMesh = (
+            asset.childObjects(of: MDLMesh.self).first as? MDLMesh
+        ) else {
+            return nil
+        }
+
+        do {
+            let mtkMesh = try MTKMesh(mesh: mdlMesh, device: device)
+            
+            return mtkMesh
+        } catch {
+            return nil
+        }
+    }
+    
     func prepareModelResources() {
         guard
             let url = modelURL,
@@ -221,6 +305,7 @@ class Renderer: NSObject, MTKViewDelegate {
             inverseProjectionMatrix: sceneData.camera.getProjectionMatrix().inverse,
             nearClip: sceneData.camera.nearClippingPlane,
             farClip: sceneData.camera.farClippingPlane,
+            lightPosition: sceneData.lightPosition,
             attributeSelector: sceneData.vertexColors
         )
         
@@ -296,6 +381,11 @@ class Renderer: NSObject, MTKViewDelegate {
                 )
             }
         }
+        
+//        renderEncoder.setRenderPipelineState(gridPipelineState)
+//        renderEncoder.setVertexBuffer(gridVertexBuffer, offset: 0, index: 0)
+//        renderEncoder.setTriangleFillMode(.fill)
+//        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         
         renderEncoder.endEncoding();
         commandBuffer.present(drawable)

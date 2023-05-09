@@ -3,7 +3,7 @@ import SwiftUI
 struct MeshInfoView: View {
     @EnvironmentObject var viewModel: ViewModel
     
-    @State private var isExpanded = false
+    @State private var isExpanded = true
     
     var body: some View {
         DisclosureGroup(
@@ -19,9 +19,26 @@ struct MeshInfoView: View {
                             Text(formattedFileSize(fromBytes: size))
                         }
                     }
+                    
+                    HStack {
+                        Text("Vertex Count:")
 
-                    Text("vertex count")
-                    Text("triangle count")
+                        Spacer()
+
+                        if let verts = viewModel.numVertices {
+                            Text(String(verts))
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Triangle Count:")
+
+                        Spacer()
+
+                        if let tris = viewModel.numTriangles {
+                            Text(String(tris))
+                        }
+                    }
                 }
             },
             label: {

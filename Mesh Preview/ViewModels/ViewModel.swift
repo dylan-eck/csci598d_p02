@@ -5,14 +5,33 @@ class ViewModel: ObservableObject {
     
     @Published var modelURL: URL? {
         didSet {
-            if let url = modelURL {
-                sceneData.modelURL = url
-                modelFileSize = fileSize(atURL: url)
-            }
+            sceneData.modelURL = modelURL
         }
     }
     
-    @Published private(set) var modelFileSize: Int?
+    @Published var modelFileSize: Int? {
+        didSet {
+            sceneData.modelFileSize = modelFileSize
+        }
+    }
+    
+    @Published var numVertices: Int? {
+        didSet {
+            sceneData.numVertices = numVertices
+        }
+    }
+    
+    @Published var numTriangles: Int? {
+        didSet {
+            sceneData.numTriangle = numTriangles
+        }
+    }
+    
+    @Published var lightPosition: Vec3 {
+        didSet {
+            sceneData.lightPosition = lightPosition
+        }
+    }
     
     @Published var backgroundColor: Vec3 {
         didSet {
@@ -29,23 +48,21 @@ class ViewModel: ObservableObject {
     @Published private(set) var vertexColoringOptions: [vertexColoringOption]
     
     @objc func saveSceneData() {
-        print("\n### SAVE ###\n")
         saveSceneDataToFile(sceneData: sceneData, fileName: "scene_data.json")
     }
     
     init() {
-        if let sceneData = loadSceneDataFromFile(fileName: "scene_data.json") {
-            print("\n loading saved scene data\n")
-            self.sceneData = sceneData
-        } else {
-            self.sceneData = SceneData()
-        }
-    
+        sceneData = loadSceneDataFromFile(fileName: "scene_data.json") ?? SceneData()
+        
         self.modelURL = sceneData.modelURL
         self.modelFileSize = sceneData.modelFileSize
         self.backgroundColor = sceneData.backgroundColor
         self.vertexColors = sceneData.vertexColors
         self.vertexColoringOptions = sceneData.vertexColoringOptions
+        self.lightPosition = sceneData.lightPosition
+        self.modelFileSize = sceneData.modelFileSize
+        self.numVertices = sceneData.numVertices
+        self.numTriangles = sceneData.numTriangle
         
         NotificationCenter.default.addObserver(self, selector: #selector(saveSceneData), name: .appWillTerminate, object: nil)
     }
@@ -75,9 +92,7 @@ func saveSceneDataToFile(sceneData: SceneData, fileName: String) {
         let data = try encoder.encode(sceneData)
         if let dir = getApplicationSupportDirectory() {
             let fileURL = dir.appendingPathComponent(fileName)
-            print("\nsaving scene data to \(fileURL)")
             try data.write(to: fileURL)
-            print("scene data saved to: \(fileURL)\n")
         }
     } catch {
         print("failed to save scene data: \(error)")

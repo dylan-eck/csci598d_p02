@@ -20,6 +20,8 @@ func fileSize(atURL url: URL) -> Int? {
 class SceneData: Codable {
     var modelURL: URL?
     var modelFileSize: Int? = nil
+    var numVertices: Int? = nil
+    var numTriangle: Int? = nil
     
     var camera = Camera()
     var lastMouseLocation: Vec2? = nil
@@ -29,8 +31,10 @@ class SceneData: Codable {
     var minCameraDistance: Float32 = 0.1
     var maxCameraDistance: Float32 = 100.0
     
+    var lightPosition: Vec3 = Vec3(0.0, -2.0, 0.0)
+    
     var backgroundColor: Vec3 = Vec3(1.0, 0.0, 1.0)
-    var vertexColors: UInt32 = VertexAttributeColor.rawValue
+    var vertexColors: UInt32 = VertexAttributePosition.rawValue
     
     
     var vertexColoringOptions = [
@@ -48,26 +52,6 @@ class SceneData: Codable {
         camera.projection = .perspective
         
         cameraDistance = sqrt(dot(camera.position, camera.position))
-        
-//        if let modelURLBookmark = UserDefaults.standard.data(forKey: UserDefaults.lastURLBookmarkKey) {
-//            do {
-//                var isStale = false
-//                let bookmarkURL = try URL(
-//                    resolvingBookmarkData: modelURLBookmark,
-//                    options: [.withSecurityScope, .withoutUI],
-//                    relativeTo: nil,
-//                    bookmarkDataIsStale: &isStale
-//                )
-//
-//                if !isStale && bookmarkURL.startAccessingSecurityScopedResource() {
-//                    modelURL = bookmarkURL
-//                    bookmarkURL.stopAccessingSecurityScopedResource()
-//                }
-//            } catch {
-//                print("failed to resolve model url bookmark: \(error)")
-//            }
-//        }
-        
     }
     
     func toggleProjection() {

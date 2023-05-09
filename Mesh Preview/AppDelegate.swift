@@ -8,7 +8,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        print("\n### APP WILL TERMINATE ###\n")
         NotificationCenter.default.post(name: .appWillTerminate, object: nil)
     }
 }

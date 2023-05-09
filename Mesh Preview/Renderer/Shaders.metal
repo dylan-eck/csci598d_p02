@@ -47,17 +47,17 @@ vertex VertexOut vertexShader(
 }
 
 fragment float4 fragmentShader(VertexOut input [[stage_in]]) {
-    float3 lightPosition = float3(0.0, -2.0, 0.0);
-    float3 directionToLight = normalize(-lightPosition);
-    
-    float3 light;
-    
-    float ambientItensity = 0.5;
-    float diffuseIntensity = max(dot(input.normal, directionToLight), 0.0);
-    
-    light = diffuseIntensity * float3(0.0, 0.0, 1.0) + ambientItensity * float3(1.0, 0.0, 0.0);
+//    float3 lightPosition = float3(0.0, -2.0, 0.0);
+//    float3 directionToLight = normalize(-lightPosition);
+//
+//    float3 light;
+//
+//    float ambientItensity = 0.5;
+//    float diffuseIntensity = max(dot(input.normal, directionToLight), 0.0);
+//
+//    light = diffuseIntensity * float3(0.0, 0.0, 1.0) + ambientItensity * float3(1.0, 0.0, 0.0);
 
-    return float4(light, 1.0);
+    return input.color;
 }
 
 
