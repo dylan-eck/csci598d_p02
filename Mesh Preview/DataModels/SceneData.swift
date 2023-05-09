@@ -1,6 +1,6 @@
 import Foundation
 
-struct vertexColoringOption: Identifiable {
+struct vertexColoringOption: Identifiable, Codable {
     var name: String
     var id: UInt32
 }
@@ -17,7 +17,7 @@ func fileSize(atURL url: URL) -> Int? {
     return nil
 }
 
-class SceneData {
+class SceneData: Codable {
     var modelURL: URL?
     var modelFileSize: Int? = nil
     
@@ -49,24 +49,24 @@ class SceneData {
         
         cameraDistance = sqrt(dot(camera.position, camera.position))
         
-        if let modelURLBookmark = UserDefaults.standard.data(forKey: UserDefaults.lastURLBookmarkKey) {
-            do {
-                var isStale = false
-                let bookmarkURL = try URL(
-                    resolvingBookmarkData: modelURLBookmark,
-                    options: [.withSecurityScope, .withoutUI],
-                    relativeTo: nil,
-                    bookmarkDataIsStale: &isStale
-                )
-
-                if !isStale && bookmarkURL.startAccessingSecurityScopedResource() {
-                    modelURL = bookmarkURL
-                    bookmarkURL.stopAccessingSecurityScopedResource()
-                }
-            } catch {
-                print("failed to resolve model url bookmark: \(error)")
-            }
-        }
+//        if let modelURLBookmark = UserDefaults.standard.data(forKey: UserDefaults.lastURLBookmarkKey) {
+//            do {
+//                var isStale = false
+//                let bookmarkURL = try URL(
+//                    resolvingBookmarkData: modelURLBookmark,
+//                    options: [.withSecurityScope, .withoutUI],
+//                    relativeTo: nil,
+//                    bookmarkDataIsStale: &isStale
+//                )
+//
+//                if !isStale && bookmarkURL.startAccessingSecurityScopedResource() {
+//                    modelURL = bookmarkURL
+//                    bookmarkURL.stopAccessingSecurityScopedResource()
+//                }
+//            } catch {
+//                print("failed to resolve model url bookmark: \(error)")
+//            }
+//        }
         
     }
     

@@ -21,16 +21,16 @@ struct MeshPreviewApp: App {
                         panel.canChooseDirectories = false
                         if panel.runModal() == .OK, let url = panel.url {
                             viewModel.modelURL = url
-                            do {
-                                let bookmarkData = try url.bookmarkData(
-                                    options: [.withSecurityScope],
-                                    includingResourceValuesForKeys: nil,
-                                    relativeTo: nil
-                                )
-                                UserDefaults.standard.set(bookmarkData, forKey: UserDefaults.lastURLBookmarkKey)
-                            } catch {
-                                print("error creating model url bookmark: \(error)")
-                            }
+//                            do {
+//                                let bookmarkData = try url.bookmarkData(
+//                                    options: [.withSecurityScope],
+//                                    includingResourceValuesForKeys: nil,
+//                                    relativeTo: nil
+//                                )
+//                                UserDefaults.standard.set(bookmarkData, forKey: UserDefaults.lastURLBookmarkKey)
+//                            } catch {
+//                                print("error creating model url bookmark: \(error)")
+//                            }
                         }
                     }.keyboardShortcut("o", modifiers: .command)
                 }
