@@ -1,15 +1,12 @@
-//
-//  Mat4.swift
-//  CSCI598D_P02_ECK
-//
-//  Created by Dylan Eck on 4/13/23.
-//
-
 import Foundation
 import simd
 
 typealias Vec2 = simd_float2
 extension Vec2 {
+    init(_ point: CGPoint) {
+        self.init(Float(point.x), Float(point.y))
+    }
+
     var formattedString: String {
         String(format: "(% .4f, % .4f)", self.x, self.y)
     }

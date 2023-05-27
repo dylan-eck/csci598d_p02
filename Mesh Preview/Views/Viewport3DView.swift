@@ -1,5 +1,3 @@
-import Foundation
-
 import SwiftUI
 import MetalKit
 
@@ -11,29 +9,19 @@ struct Viewport3DView: NSViewRepresentable {
     }
     
     func makeNSView(context: NSViewRepresentableContext<Viewport3DView>) -> MTKView {
-        let mtkView = MTKView()
+        let mtkView = CustomMTKView()
         mtkView.delegate = context.coordinator
+        mtkView.touchesDelegate = context.coordinator
         mtkView.preferredFramesPerSecond = 60
         mtkView.enableSetNeedsDisplay = false
         mtkView.framebufferOnly = false
         mtkView.drawableSize = mtkView.frame.size
         mtkView.depthStencilPixelFormat = .depth32Float
         
+        
         if let device = MTLCreateSystemDefaultDevice() {
             mtkView.device = device
         }
-        
-        let panGestureRecognizer = NSPanGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(context.coordinator.handlePanGesture(_:))
-        )
-        mtkView.addGestureRecognizer(panGestureRecognizer)
-
-        let magnificationGestureRecognizer = NSMagnificationGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(context.coordinator.handleMagnificationGesture(_:))
-        )
-        mtkView.addGestureRecognizer(magnificationGestureRecognizer)
 
         return mtkView
     }

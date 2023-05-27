@@ -52,7 +52,8 @@ enum RenderDeviceBufferError: Error {
     case creationFailed
 }
 
-class Renderer: NSObject, MTKViewDelegate {
+class Renderer: NSObject, MTKViewDelegate, CustomMTKViewDelegate {
+
     var parent: Viewport3DView
     var device: MTLDevice
     var commandQueue: MTLCommandQueue?
@@ -329,7 +330,32 @@ class Renderer: NSObject, MTKViewDelegate {
         return nil
     }
     
+    
+    private var gesturePosLastDraw: CGPoint? = nil
+    private var gestureDistLastDraw: CGFloat? = nil
+    
     func draw(in view: MTKView) {
+        sceneData.mouseDelta = Vec2(0, 0)
+        if
+            gestureType == .drag,
+            let prevPos = gesturePosLastDraw,
+            let currPos = currGesturePosition
+        {
+            let dp = CGPoint(x: currPos.x - prevPos.x, y: -1 * (currPos.y - prevPos.y))
+            sceneData.mouseDelta = Vec2(Float32(dp.x), Float32(dp.y))
+        }
+        gesturePosLastDraw = currGesturePosition
+        
+        if
+            gestureType == .pinch,
+            let prevDist = gestureDistLastDraw,
+            let currDist = currGestureDistance
+        {
+            let dd = currDist - prevDist
+            sceneData.cameraDistance -= 10.0 * Float32(dd)
+        }
+        gestureDistLastDraw = currGestureDistance
+    
         let systemTime = CACurrentMediaTime()
         let deltaTime = (lastRenderTime == nil) ? 0 : (systemTime - lastRenderTime!)
         lastRenderTime = systemTime
@@ -392,43 +418,90 @@ class Renderer: NSObject, MTKViewDelegate {
         commandBuffer.commit()
     }
     
-    private var panSensitivity: Float32 = 1.0
     
+    enum GestureType {
+        case drag
+        case pinch
+        case none
+        case any
+    }
     
-    @objc func handlePanGesture(_ gestureRecognizer: NSPanGestureRecognizer) {
-        let translation = gestureRecognizer.translation(in: gestureRecognizer.view)
-
-        if gestureRecognizer.state == .ended {
-            sceneData.lastMouseLocation = nil
-            sceneData.mouseDelta = Vec2(0, 0)
-        } else {
-            let currentMouseLocation = Vec2(Float32(translation.x), Float32(-translation.y))
-            if let lastMouseLocation = sceneData.lastMouseLocation {
-                let mouseDelta = (currentMouseLocation - lastMouseLocation) * panSensitivity
-                if abs(mouseDelta.x) > 0.0001 && abs(mouseDelta.y) > 0.0001 {
-                    sceneData.mouseDelta = mouseDelta
+    private var gestureStarted = false
+    private var identificationMinUpdates = 10
+    
+    private var prevGesturePosition: CGPoint? = nil
+    private var currGesturePosition: CGPoint? = nil
+    private var translationAccumulator: Float32 = 0.0
+    
+    private var prevGestureDistance: CGFloat? = nil
+    private var currGestureDistance: CGFloat? = nil
+    private var distanceChangeAccumulator: Float32 = 0.0
+    
+    private var gestureType: GestureType = .none
+    private var gestureUpdateCounter = 0
+    
+    private var lastUpdateTime: Date?
+    
+    func handleTouches(_ view: CustomMTKView, touches: Set<NSTouch>) {
+        if touches.count == 2 {
+            let touchArray = Array(touches)
+            let touch1 = touchArray[0]
+            let touch2 = touchArray[1]
+            
+            let midpointX = touches.reduce(0.0) { $0 + $1.normalizedPosition.x } / CGFloat(touches.count)
+            let midpointY = touches.reduce(0.0) { $0 + $1.normalizedPosition.y } / CGFloat(touches.count)
+            
+            currGesturePosition = CGPoint(x: midpointX, y: midpointY)
+            
+            let dx = touch1.normalizedPosition.x - touch2.normalizedPosition.x
+            let dy = touch1.normalizedPosition.y - touch2.normalizedPosition.y
+            let distance = sqrt(dx*dx + dy*dy)
+            currGestureDistance = distance
+            
+            if !gestureStarted {
+                gestureStarted = true
+            }
+            
+            if gestureUpdateCounter < identificationMinUpdates {
+                
+                if
+                    let prevPos = prevGesturePosition,
+                    let currPos = currGesturePosition,
+                    let prevDist = prevGestureDistance,
+                    let currDist = currGestureDistance
+                {
+                    let dpmag = abs(length(Vec2(currPos) - Vec2(prevPos)))
+                    let ddmag = Float32(abs(currDist - prevDist))
+                    
+                    translationAccumulator += dpmag
+                    distanceChangeAccumulator += ddmag
+                }
+            } else {
+                if translationAccumulator > distanceChangeAccumulator {
+                    gestureType = .drag
                 } else {
-                    sceneData.mouseDelta = Vec2(0, 0)
+                    gestureType = .pinch
                 }
             }
-            sceneData.lastMouseLocation = currentMouseLocation
+            
+            if let currPos = currGesturePosition, let currDist = currGestureDistance {
+                prevGesturePosition = currPos
+                prevGestureDistance = currDist
+            }
+            
+            gestureUpdateCounter += 1
+            
+        } else if gestureStarted{
+            gestureStarted = false
+            prevGesturePosition = nil
+            currGesturePosition = nil
+            translationAccumulator = 0.0
+            prevGestureDistance = nil
+            currGestureDistance = nil
+            distanceChangeAccumulator = 0.0
+            gestureType = .none
+            gestureUpdateCounter = 0
         }
     }
-    
-    private let minValue: Float32 = 0.5
-    private let maxValue: Float32 = 2.0
-    private var currentScale: Float32 = 1.0
-    private var sensitivity: Float32 = 0.01
-    
-    @objc func handleMagnificationGesture(_ gestureRecognizer: NSMagnificationGestureRecognizer) {
-        let magnification = Float32(gestureRecognizer.magnification) * sensitivity
-        let scaleFactor = 1.0 + magnification
-        let newScale = currentScale * scaleFactor
-        
-        let newScaleClamped = min(max(newScale, minValue), maxValue)
-         
-        currentScale = newScaleClamped
-        
-        sceneData.cameraDistance = ((currentScale - minValue) / (maxValue - minValue)) * (sceneData.minCameraDistance - sceneData.maxCameraDistance) + sceneData.maxCameraDistance
-    }
 }
+

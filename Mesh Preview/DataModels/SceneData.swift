@@ -47,7 +47,7 @@ class SceneData: Codable {
     
     init() {
         camera.position = Vec3(0, 2, 4)
-        camera.orthographicFocusPlane = 4
+        camera.orthographicFocusPlane = length(camera.position)
         camera.target = Vec3(0, 0, 0)
         camera.projection = .perspective
         
@@ -74,7 +74,7 @@ class SceneData: Codable {
 
         
         if mouseDelta != Vec2(0, 0) {            
-            let scale: Float32 = 4.0
+            let scale: Float32 = 1000.0
 
             let homogeneousPosition = Vec4(camera.position, 1)
             let homogeneousTarget = Vec4(camera.target!, 1)
@@ -107,6 +107,6 @@ class SceneData: Codable {
             camera.position.z * camera.position.z
         )
 
-        camera.orthographicFocusPlane = xzDistanceFromOrigin
+        camera.orthographicFocusPlane = length(camera.position)
     }
 }
